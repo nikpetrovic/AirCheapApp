@@ -5,7 +5,7 @@ let AirCheapAPI = {
 	fetchAirports() {
 		fetch('airports.json')
 			.then((response) => response.json())
-			.then((data) = > {
+			.then((data) => {
 				// Call the AirportActionCreators success action with the parsed data
 				AirportActionCreators.fetchAirportsSuccess(data);
 			})

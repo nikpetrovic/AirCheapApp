@@ -1,5 +1,5 @@
 import AppDispatcher from '../AppDispatcher';
-import ReduceStore from 'flux/utils';
+import { ReduceStore } from 'flux/utils';
 import constants from '../constants';
 
 class AirportStore extends ReduceStore {
@@ -8,8 +8,9 @@ class AirportStore extends ReduceStore {
   }
 
   reduce(state, action) {
-    swith(action.type) {
+    switch(action.type) {
       case constants.FETCH_AIROPRTS_SUCCESS:
+        JSON.stringify(action.payload.response);
         return action.payload.response;
       default:
         return state;
@@ -17,4 +18,4 @@ class AirportStore extends ReduceStore {
   }
 }
 
-export default AirportStore(AppDispatcher);
+export default new AirportStore(AppDispatcher);
