@@ -3,19 +3,17 @@ import { render } from 'react-dom';
 import { Container } from 'flux/utils';
 import Autosuggest from 'react-autosuggest';
 import AirportStore from './stores/AirportStore';
+import AutosuggestStore from './stores/AutosuggestStore';
 import AirportActionCreators from './actions/AirportActionCreators';
+import AutosuggestActions from './actions/AutosuggestActions';
 
-export class App extends Component {
+class App extends Component {
 	constructor() {
 		super();
-
-		this.state = {
-			value: '',
-			suggestions: this.getSuggestions('')
-		};
 	}
 
 	componentDidMount() {
+		console.log("componentDidMount")
 		AirportActionCreators.fetchAirports();
 	}
 
@@ -23,14 +21,9 @@ export class App extends Component {
 		const escapedInput = input.trim().toLowerCase();
 		const airportMatchRegex = new RegExp('\\b' + escapedInput + 'i');
 
-		console.log(JSON.stringify(this.state));
-
-		if (typeof this.state === 'undefined' || typeof this.state.airports === 'undefined') {
-			console.log('izlaz');
+		if (typeof this.state == 'undefined' || this.state == null) {
 			return [];
 		}
-
-		console.log('nastavak');
 
 		const suggestions = this.state.airports
 					.filter(airport => airportMatchRegex.test(airport.city))
@@ -39,8 +32,6 @@ export class App extends Component {
 					})
 					.slice(0, 7)
 					.map(airport => `${airport.city} - ${airport.country} ${airport.code}`);
-
-		console.log(JSON.stringify(suggestions));
 
 		return suggestions;
 	}
@@ -56,9 +47,7 @@ export class App extends Component {
 	}
 
 	onChange(event, { newValue }) {
-		this.setState({
-			value: newValue
-		});
+		AutosuggestActions.valueChanged(newValue);
 	}
 
 	onSuggestionsUpdateRequested({ value }) {
@@ -76,9 +65,8 @@ export class App extends Component {
 						<p>Check discount ticket prices and pay using your AirCheap points</p>
 					</div>
 					<div className="header-route">
-						<Autosuggest id='origin' inputProps={ { placeholder: 'From', value: '', onChange: this.onChange.bind(this) } } suggestions={ this.state.suggestions }
+						<Autosuggest id='origin' inputProps={ { placeholder: 'From', value: this.state.value, onChange: this.onChange.bind(this) } } suggestions={ this.state.airports }
 							onSuggestionsUpdateRequested={this.onSuggestionsUpdateRequested.bind(this)} getSuggestionValue={this.getSuggestionValue} renderSuggestion={this.renderSuggestion} />
-
 					</div>
 				</header>
 			</div>
@@ -86,58 +74,14 @@ export class App extends Component {
 	}
 }
 
-App.getStores = () => ([ AirportStore ]);
-App.calculateState = (prevState) => {{
-	airports: AirportStore.getState()
-}};
+App.getStores = () => ([ AirportStore, AutosuggestStore ]);
+App.calculateState = (prevState) => {
+	return {
+		airports: AirportStore.getState(),
+		value: AutosuggestStore.getState()
+	}
+};
 
 const AppContainer = Container.create(App);
 
 render(<AppContainer />, document.getElementById('root'));
-
-/*	constructor() {
-		super();
-
-		this.state = {
-			value: '',
-			suggestions: this.getSuggestions('')
-		}
-	}
-
-	getSuggestions(input) {
-		return ['1', '2', '3'];
-	}
-
-	getSuggestionValue(suggestion) {
-		return suggestion;
-	}
-
-	renderSuggestion(suggestion, { value, valueBeforeUpDown }) {
-		return <span>{suggestion}</span>;
-	}
-
-	onChange(event, { newValue }) {
-		this.setState({
-			value: newValue
-		});
-	}
-
-	render() {
-		const inputProps = {
-			value: this.state.value,
-			placeholder: 'some placeholder',
-			onChange: this.onChange.bind(this)
-		};
-
-		return (
-			<div>
-				<h1>Hello</h1>
-				<br />
-
-				<Autosuggest suggestions = { this.state.suggestions } inputProps = { { value: this.state.value, placeholder: 'place', onChange: this.onChange.bind(this) } } getSuggestionValue = {this.getSuggestionValue} renderSuggestion = {this.renderSuggestion} />
-			</div>
-		);
-	}
-}*/
-
-render(<App />, document.getElementById('root'));
