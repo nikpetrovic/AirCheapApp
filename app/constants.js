@@ -5,5 +5,10 @@ export default {
 	CHOOSE_AIRPORT: 'choose airport',
 	FETCH_TICKETS: 'fetch tickets',
 	FETCH_TICKETS_SUCCESS: 'fetch tickets success',
-	FETCH_TICKETS_ERROR: 'fetch tickets error'
+	FETCH_TICKETS_ERROR: 'fetch tickets error',
+
+	//Autosuggest
+	TO_VALUE_CHANGED: 'toValueChanged',
+	FROM_VALUE_CHANGED: 'fromValueChanged',
+	UPDATE_REQUESTED: 'updateRequested'
 };
