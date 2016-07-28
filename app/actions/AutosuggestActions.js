@@ -1,10 +1,24 @@
 import AppDispatcher from '../AppDispatcher';
 
 let AutosuggestActions = {
-  valueChanged(newValue) {
+  toValueChanged(newValue) {
     AppDispatcher.dispatch({
-      action: "valueChanged",
+      type: "toValueChanged",
       payload: newValue
+    });
+  },
+
+  fromValueChanged(newValue) {
+    AppDispatcher.dispatch({
+      type: "fromValueChanged",
+      payload: newValue
+    });
+  },
+  
+  updateRequested(value) {
+    AppDispatcher.dispatch({
+      type: "updateRequested",
+      payload: value
     });
   }
 }

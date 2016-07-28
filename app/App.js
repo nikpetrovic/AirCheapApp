@@ -13,22 +13,22 @@ class App extends Component {
 	}
 
 	componentDidMount() {
-		console.log("componentDidMount")
 		AirportActionCreators.fetchAirports();
 	}
 
 	getSuggestions(input) {
-		const escapedInput = input.trim().toLowerCase();
-		const airportMatchRegex = new RegExp('\\b' + escapedInput + 'i');
+		const escapedInput = input.trim();
+		const airportMatchRegex = new RegExp(escapedInput, 'i');
 
 		if (typeof this.state == 'undefined' || this.state == null) {
 			return [];
 		}
 
+
 		const suggestions = this.state.airports
-					.filter(airport => airportMatchRegex.test(airport.city))
+					.filter(airport => airportMatchRegex.test(airport.city.toLowerCase()))
 					.sort((airport1, airport2) => {
-						airport1.city.toLowerCase().indexOf(escapedInput) - airport2.city.toLowerCase().indexOf(escapedInput);
+						return airport1.city.toLowerCase().indexOf(escapedInput) - airport2.city.toLowerCase().indexOf(escapedInput);
 					})
 					.slice(0, 7)
 					.map(airport => `${airport.city} - ${airport.country} ${airport.code}`);
@@ -42,18 +42,20 @@ class App extends Component {
 
 	renderSuggestion(suggestion) {
 		return (
-			<span>{suggestion.name}</span>
+			<span>{suggestion}</span>
 		);
 	}
 
-	onChange(event, { newValue }) {
-		AutosuggestActions.valueChanged(newValue);
+	onToChange(event, { newValue }) {
+		AutosuggestActions.toValueChanged(newValue);
+	}
+
+	onFromChange(event, { newValue }) {
+		AutosuggestActions.fromValueChanged(newValue);
 	}
 
 	onSuggestionsUpdateRequested({ value }) {
-		this.setState({
-			suggestions: this.getSuggestions(value)
-		});
+		AutosuggestActions.updateRequested(this.getSuggestions(value));
 	}
 
 	render() {
@@ -65,7 +67,9 @@ class App extends Component {
 						<p>Check discount ticket prices and pay using your AirCheap points</p>
 					</div>
 					<div className="header-route">
-						<Autosuggest id='origin' inputProps={ { placeholder: 'From', value: this.state.value, onChange: this.onChange.bind(this) } } suggestions={ this.state.airports }
+						<Autosuggest id='origin' inputProps={ { placeholder: 'From', value: this.state.from, onChange: this.onFromChange.bind(this) } } suggestions={ this.state.suggestions }
+							onSuggestionsUpdateRequested={this.onSuggestionsUpdateRequested.bind(this)} getSuggestionValue={this.getSuggestionValue} renderSuggestion={this.renderSuggestion} />
+						<Autosuggest id='destination' inputProps={ { placeholder: 'To', value: this.state.to, onChange: this.onToChange.bind(this) } } suggestions={ this.state.suggestions }
 							onSuggestionsUpdateRequested={this.onSuggestionsUpdateRequested.bind(this)} getSuggestionValue={this.getSuggestionValue} renderSuggestion={this.renderSuggestion} />
 					</div>
 				</header>
@@ -78,7 +82,9 @@ App.getStores = () => ([ AirportStore, AutosuggestStore ]);
 App.calculateState = (prevState) => {
 	return {
 		airports: AirportStore.getState(),
-		value: AutosuggestStore.getState()
+		suggestions: AutosuggestStore.getState().suggestions,
+		from: AutosuggestStore.getState().from,
+		to: AutosuggestStore.getState().to
 	}
 };
 

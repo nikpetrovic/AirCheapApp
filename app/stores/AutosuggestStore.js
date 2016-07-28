@@ -1,18 +1,41 @@
 import AppDispatcher from '../AppDispatcher';
 import { ReduceStore } from 'flux/utils';
+import update from 'react-addons-update';
 
 class AutosuggestStore extends ReduceStore {
   getInitialState() {
-    return '';
+    return {
+      to: '',
+      from: '',
+      suggestions: []
+    };
   }
 
   reduce(state, action) {
     switch(action.type) {
-      case "valueChanged":
-        return action.payload;
+      case "toValueChanged":
+        return update(state, {
+          to: {
+            $set: action.payload
+          }
+        });
+      case "fromValueChanged":
+        return update(state, {
+          from: {
+            $set: action.payload
+          }
+        });
+      case "updateRequested":
+        return update(state, {
+          suggestions: {
+            $set: action.payload
+          }
+        });
       default:
         return state;
     }
+
+    return state;
   }
 }
 
